@@ -2,11 +2,12 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
+	"os"
 	"strconv"
 
 	"github.com/gocolly/colly"
-
 	_ "github.com/lib/pq"
 )
 
@@ -50,8 +51,12 @@ func main() {
 
 	c.Visit("https://www.scrapethissite.com/pages/simple/")
 
+	dbName := os.Getenv("COUNTRY_SCRAPER_DBNAME")
+	username := os.Getenv("COUNTRY_SCRAPER_USERNAME")
+	password := os.Getenv("COUNTRY_SCRAPER_PASSWORD")
+
 	// open db connection
-	connStr := "postgres://country-scraper:123abc@localhost/countries?sslmode=disable"
+	connStr := fmt.Sprintf("postgres://%s:%s@localhost/%s?sslmode=disable", username, password, dbName)
 	db, err := sql.Open("postgres", connStr)
 	defer db.Close()
 
@@ -68,11 +73,10 @@ func main() {
 
 	// insert countries into db
 	for _, country := range countries {
-		insertCountry(db, country)	
+		insertCountry(db, country)
 	}
 
 }
-
 
 func createCollector() *colly.Collector {
 	return colly.NewCollector(
