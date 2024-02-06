@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"strconv"
 
@@ -21,16 +20,13 @@ type Country struct {
 func main() {
 	countries := []Country{}
 
-	c := colly.NewCollector(
-		colly.MaxDepth(1),
-	)
+	c := createCollector()
 
+	//
 	c.OnHTML(".country", func(h *colly.HTMLElement) {
 		country := Country{}
 		country.Country = h.ChildText(".country-name")
-		fmt.Println(country.Country)
 		country.Capital = h.ChildText(".country-capital")
-		fmt.Println(country.Capital)
 		population, err := strconv.Atoi(h.ChildText(".country-population"))
 
 		if err != nil {
@@ -38,7 +34,6 @@ func main() {
 		}
 
 		country.Population = population
-		fmt.Println(country.Population)
 
 		area, err := strconv.ParseFloat(h.ChildText(".country-area"), 32)
 
@@ -49,14 +44,13 @@ func main() {
 		// Calling ParseFloat with a bitSize of 32 returns a float64
 		// that needs to be converted to float32
 		country.Area = float32(area)
-		fmt.Println(country.Area)
 
 		countries = append(countries, country)
-		fmt.Println("")
 	})
 
 	c.Visit("https://www.scrapethissite.com/pages/simple/")
 
+	// open db connection
 	connStr := "postgres://country-scraper:123abc@localhost/countries?sslmode=disable"
 	db, err := sql.Open("postgres", connStr)
 	defer db.Close()
@@ -69,13 +63,21 @@ func main() {
 		log.Fatal(err)
 	}
 
+	dropTable(db)
 	createCountriesTable(db)
 
+	// insert countries into db
 	for _, country := range countries {
-		insertCountry(db, country)
-		
+		insertCountry(db, country)	
 	}
 
+}
+
+
+func createCollector() *colly.Collector {
+	return colly.NewCollector(
+		colly.MaxDepth(1),
+	)
 }
 
 func createCountriesTable(db *sql.DB) {
@@ -106,4 +108,15 @@ func insertCountry(db *sql.DB, country Country) int {
 	}
 
 	return pk
+}
+
+func dropTable(db *sql.DB) {
+	query := `DROP TABLE countries`
+
+	_, err := db.Exec(query)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
 }
