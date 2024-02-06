@@ -1,6 +1,10 @@
+# Go Country Scraper
+
+![](Go-Logo_Blue.png)
+
 A Go 1.21.6 project that scrapes information about countries of the World from https://www.scrapethissite.com/pages/simple/.
 
-##Country Example:
+## Country Example:
 
 **Andorra**  
 **Capital**: Andorra la Vella  
