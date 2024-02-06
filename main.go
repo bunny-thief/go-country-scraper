@@ -1,20 +1,26 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
-	"github.com/gocolly/colly"
+	"log"
+	"os"
 	"strconv"
+
+	"github.com/gocolly/colly"
+
+	_ "github.com/lib/pq"
 )
 
 type country struct {
 	Country    string
 	Capital    string
 	Population int
-	Area float32
+	Area       float32
 }
 
 func main() {
-	countries := []country{	}
+	countries := []country{}
 
 	c := colly.NewCollector(
 		colly.MaxDepth(1),
@@ -26,7 +32,7 @@ func main() {
 		fmt.Println(country.Country)
 		country.Capital = h.ChildText(".country-capital")
 		fmt.Println(country.Capital)
-		population , err := strconv.Atoi(h.ChildText(".country-population"))
+		population, err := strconv.Atoi(h.ChildText(".country-population"))
 
 		if err != nil {
 			panic(err)
@@ -51,5 +57,22 @@ func main() {
 	})
 
 	c.Visit("https://www.scrapethissite.com/pages/simple/")
+
+	dbName := os.Getenv("COUNTRY_SCRAPER_DBNAME")
+	username := os.Getenv("COUNTRY_SCRAPER_USERNAME")
+	password := os.Getenv("COUNTRY_SCRAPER_PASSWORD")
+
+	// open db connection
+	connStr := fmt.Sprintf("postgres://%s:%s@localhost/%s?sslmode=disable", username, password, dbName)
+	db, err := sql.Open("postgres", connStr)
+	defer db.Close()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err = db.Ping(); err != nil {
+		log.Fatal(err)
+	}
 
 }
