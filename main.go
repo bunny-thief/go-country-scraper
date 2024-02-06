@@ -69,4 +69,22 @@ func main() {
 		log.Fatal(err)
 	}
 
+	createCountriesTable(db)
+
+}
+
+func createCountriesTable(db *sql.DB) {
+	query := `CREATE TABLE IF NOT EXISTS country(
+		id SERIAL PRIMARY KEY,
+		country_name VARCHAR(50),
+		capital VARCHAR(40),
+		population int,
+		area		DECIMAL(8,2)
+	)`
+
+	_, err := db.Exec(query)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 }
