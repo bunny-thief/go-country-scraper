@@ -12,7 +12,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-type country struct {
+type Country struct {
 	Country    string
 	Capital    string
 	Population int
@@ -20,18 +20,15 @@ type country struct {
 }
 
 func main() {
-	countries := []country{}
+	countries := []Country{}
 
-	c := colly.NewCollector(
-		colly.MaxDepth(1),
-	)
+	c := createCollector()
 
+	//
 	c.OnHTML(".country", func(h *colly.HTMLElement) {
-		country := country{}
+		country := Country{}
 		country.Country = h.ChildText(".country-name")
-		fmt.Println(country.Country)
 		country.Capital = h.ChildText(".country-capital")
-		fmt.Println(country.Capital)
 		population, err := strconv.Atoi(h.ChildText(".country-population"))
 
 		if err != nil {
@@ -39,7 +36,6 @@ func main() {
 		}
 
 		country.Population = population
-		fmt.Println(country.Population)
 
 		area, err := strconv.ParseFloat(h.ChildText(".country-area"), 32)
 
@@ -50,10 +46,8 @@ func main() {
 		// Calling ParseFloat with a bitSize of 32 returns a float64
 		// that needs to be converted to float32
 		country.Area = float32(area)
-		fmt.Println(country.Area)
 
 		countries = append(countries, country)
-		fmt.Println("")
 	})
 
 	c.Visit("https://www.scrapethissite.com/pages/simple/")
@@ -75,20 +69,57 @@ func main() {
 		log.Fatal(err)
 	}
 
+	dropTable(db)
 	createCountriesTable(db)
+
+	// insert countries into db
+	for _, country := range countries {
+		insertCountry(db, country)
+	}
 
 }
 
+func createCollector() *colly.Collector {
+	return colly.NewCollector(
+		colly.MaxDepth(1),
+	)
+}
+
 func createCountriesTable(db *sql.DB) {
-	query := `CREATE TABLE IF NOT EXISTS country(
+	query := `CREATE TABLE IF NOT EXISTS countries(
 		id SERIAL PRIMARY KEY,
 		country_name VARCHAR(50),
 		capital VARCHAR(40),
-		population int,
-		area		DECIMAL(8,2)
+		population int
 	)`
 
 	_, err := db.Exec(query)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+}
+
+func insertCountry(db *sql.DB, country Country) int {
+	query := `INSERT INTO countries (country_name, capital, population)
+	values($1, $2, $3) RETURNING id`
+
+	var pk int
+
+	err := db.QueryRow(query, country.Country, country.Capital, country.Population).Scan(&pk)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return pk
+}
+
+func dropTable(db *sql.DB) {
+	query := `DROP TABLE countries`
+
+	_, err := db.Exec(query)
+
 	if err != nil {
 		log.Fatal(err)
 	}
