@@ -11,7 +11,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-type country struct {
+type Country struct {
 	Country    string
 	Capital    string
 	Population int
@@ -19,14 +19,14 @@ type country struct {
 }
 
 func main() {
-	countries := []country{}
+	countries := []Country{}
 
 	c := colly.NewCollector(
 		colly.MaxDepth(1),
 	)
 
 	c.OnHTML(".country", func(h *colly.HTMLElement) {
-		country := country{}
+		country := Country{}
 		country.Country = h.ChildText(".country-name")
 		fmt.Println(country.Country)
 		country.Capital = h.ChildText(".country-capital")
@@ -71,15 +71,19 @@ func main() {
 
 	createCountriesTable(db)
 
+	for _, country := range countries {
+		insertCountry(db, country)
+		
+	}
+
 }
 
 func createCountriesTable(db *sql.DB) {
-	query := `CREATE TABLE IF NOT EXISTS country(
+	query := `CREATE TABLE IF NOT EXISTS countries(
 		id SERIAL PRIMARY KEY,
 		country_name VARCHAR(50),
 		capital VARCHAR(40),
-		population int,
-		area		DECIMAL(8,2)
+		population int
 	)`
 
 	_, err := db.Exec(query)
@@ -87,4 +91,19 @@ func createCountriesTable(db *sql.DB) {
 		log.Fatal(err)
 	}
 
+}
+
+func insertCountry(db *sql.DB, country Country) int {
+	query := `INSERT INTO countries (country_name, capital, population)
+	values($1, $2, $3) RETURNING id`
+
+	var pk int
+
+	err := db.QueryRow(query, country.Country, country.Capital, country.Population).Scan(&pk)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return pk
 }
