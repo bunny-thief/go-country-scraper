@@ -85,7 +85,7 @@ func createCollector() *colly.Collector {
 }
 
 func createCountriesTable(db *sql.DB) {
-	query := `CREATE TABLE IF NOT EXISTS countries(
+	query := `CREATE TABLE IF NOT EXISTS country(
 		id SERIAL PRIMARY KEY,
 		country_name VARCHAR(50),
 		capital VARCHAR(40),
@@ -100,7 +100,7 @@ func createCountriesTable(db *sql.DB) {
 }
 
 func insertCountry(db *sql.DB, country Country) int {
-	query := `INSERT INTO countries (country_name, capital, population)
+	query := `INSERT INTO country (country_name, capital, population)
 	values($1, $2, $3) RETURNING id`
 
 	var pk int
@@ -115,7 +115,7 @@ func insertCountry(db *sql.DB, country Country) int {
 }
 
 func dropTable(db *sql.DB) {
-	query := `DROP TABLE countries`
+	query := `DROP TABLE country`
 
 	_, err := db.Exec(query)
 
