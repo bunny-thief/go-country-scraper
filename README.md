@@ -1,10 +1,8 @@
-![](Go-Logo_Blue.png)
-
-# Go Country Scraper
+![](Go-Logo_Blue_scraper.png)
 
 A Go project that scrapes information about countries of the World from https://www.scrapethissite.com/pages/simple/ and inserts the data into a PostgresQL table.
 
-### Sample Country:
+### Sample Country Data:
 
 **Andorra**  
 **Capital**: Andorra la Vella  
@@ -42,7 +40,7 @@ username := os.Getenv("COUNTRY_SCRAPER_USERNAME")
 password := os.Getenv("COUNTRY_SCRAPER_PASSWORD")
 ```
 
-Therefore, you need to name the environment variables COUNTRY_SCRAPER_DBNAME, COUNTRY_SCRAPER_USERNAME and COUNTRY_SCRAPER_PASSWORD. Optionally, you can simply edit those three lines and place the pertinent information directly in the script.
+Therefore, you need to name the environment variables COUNTRY_SCRAPER_DBNAME, COUNTRY_SCRAPER_USERNAME and COUNTRY_SCRAPER_PASSWORD. Optionally, you can simply edit those three lines and place the pertinent information directly in the script if you don't want to use environment variables.
 
 ```go
 dbName := "<database name>"
@@ -53,6 +51,7 @@ password := "<password>"
 ### Installing
 
 Clone the Github repository.
+
 ```
 git clone git@github.com:bunny-thief/go-country-scraper.git
 ```
@@ -69,14 +68,6 @@ Execute the **main.go** file.
 
 ```
 go run main.go
-```
-
-## Help
-
-Any advise for common problems or issues.
-
-```
-command to run if program contains helper info
 ```
 
 ## Authors
