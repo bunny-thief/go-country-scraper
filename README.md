@@ -11,9 +11,9 @@ A Go project that scrapes information about countries of the World from https://
 
 ## Description
 
-Scrapping is done with [Colly](https://go-colly.org/ 'go-colly.org'). Once the information is scrapped it is inserted into a local PostgresQL database. The scraped data was used to create a Spring/Spring Boot REST API project called [countries-api](https://github.com/bunny-thief/countries-api 'countries-api repo').
+Scrapping is done with [Colly](https://go-colly.org/ 'go-colly.org'). Once the information is scrapped it is inserted into a local PostgresQL database. The scraped data was used to create a Spring/Spring Boot REST API project called [countries-api](https://github.com/jacques-navarro/countries-api 'countries-api repo').
 
-This project is a reimplementation of a previous Javascript project ([country-scraper](https://github.com/bunny-thief/country-scraper 'country-scraper')) that used Puppeter to scrape date from the same site.
+This project is a reimplementation of a previous Javascript project ([country-scraper](https://github.com/jacques-navarro/country-scraper 'country-scraper')) that used Puppeter to scrape date from the same site.
 
 ## Getting Started
 
@@ -53,7 +53,7 @@ password := "<password>"
 Clone the Github repository.
 
 ```
-git clone git@github.com:bunny-thief/go-country-scraper.git
+git clone git@github.com:jacques-navarro/go-country-scraper.git
 ```
 
 ### Executing program
